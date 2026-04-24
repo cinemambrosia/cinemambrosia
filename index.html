@@ -13,82 +13,136 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1a1a1a;
+            color: #e0e0e0;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
         }
         
-        .container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
+        .sidebar {
+            width: 280px;
+            background: #0d0d0d;
+            border-right: 1px solid #333;
+            padding: 30px 20px;
+            overflow-y: auto;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+        
+        .sidebar h2 {
+            color: #fff;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .menu-item {
+            padding: 12px 16px;
+            background: #222;
+            border: 1px solid #333;
+            color: #b0b0b0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-align: left;
+        }
+        
+        .menu-item:hover {
+            background: #2a2a2a;
+            border-color: #667eea;
+            color: #e0e0e0;
+        }
+        
+        .menu-item.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            padding: 60px 40px;
+            width: calc(100% - 280px);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .content-header {
+            text-align: center;
+            margin-bottom: 60px;
         }
         
         h1 {
-            color: #333;
+            color: #fff;
+            font-size: 3em;
             margin-bottom: 10px;
-            text-align: center;
-            font-size: 2.5em;
         }
         
         .subtitle {
-            color: #666;
-            text-align: center;
-            margin-bottom: 40px;
+            color: #888;
             font-size: 1.1em;
         }
         
         .question {
             color: #667eea;
-            font-size: 1.8em;
-            margin-bottom: 30px;
+            font-size: 2em;
+            font-weight: 600;
             text-align: center;
-            font-weight: 600;
-        }
-        
-        .tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
             margin-bottom: 40px;
-            justify-content: center;
         }
         
-        .tag-btn {
-            padding: 10px 20px;
-            border: 2px solid #667eea;
-            background: white;
-            color: #667eea;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
+        .page-content {
+            display: none;
+            width: 100%;
+            max-width: 700px;
         }
         
-        .tag-btn:hover {
-            background: #f0f0f0;
-            transform: translateY(-2px);
+        .page-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
         
-        .tag-btn.active {
-            background: #667eea;
-            color: white;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .initial-page {
+            text-align: center;
+        }
+        
+        .initial-page.active {
+            display: block;
         }
         
         .movies-container {
-            display: grid;
-            gap: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
         .movie-card {
-            background: #f9f9f9;
+            background: #222;
             border-left: 4px solid #667eea;
             padding: 20px;
             border-radius: 8px;
@@ -96,22 +150,22 @@
         }
         
         .movie-card:hover {
-            background: #f0f0f0;
+            background: #2a2a2a;
             transform: translateX(5px);
         }
         
         .movie-title {
-            color: #333;
-            font-size: 1.4em;
+            color: #fff;
+            font-size: 1.3em;
             font-weight: 600;
             margin-bottom: 8px;
         }
         
         .movie-tag {
             display: inline-block;
-            background: #764ba2;
+            background: #667eea;
             color: white;
-            padding: 4px 12px;
+            padding: 5px 12px;
             border-radius: 15px;
             font-size: 0.85em;
             font-weight: 600;
@@ -119,42 +173,60 @@
         
         .empty-state {
             text-align: center;
-            color: #999;
+            color: #666;
             padding: 40px 20px;
             font-size: 1.1em;
         }
         
-        .info-box {
-            background: #f0f4ff;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 30px;
-            font-size: 0.9em;
-            color: #555;
+        .page-title {
+            color: #fff;
+            font-size: 2em;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid #333;
+                padding: 20px;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎬 Movies</h1>
-        <p class="subtitle">Explore by genre</p>
+    <div class="sidebar">
+        <h2>🎬 Genres</h2>
+        <div class="menu-items" id="menuItems"></div>
+    </div>
+    
+    <div class="main-content">
+        <div class="initial-page active" id="initialPage">
+            <div class="content-header">
+                <h1>🎬 Movies</h1>
+                <p class="subtitle">Explore by genre</p>
+            </div>
+            <div class="question">What do you want to watch?</div>
+        </div>
         
-        <div class="question">What do you want to watch?</div>
-        
-        <div class="tags-container" id="tagsContainer"></div>
-        
-        <div class="movies-container" id="moviesContainer"></div>
-        
-        <div class="info-box">
-            <strong>💡 Tip:</strong> Click on tags to filter movies. Click again to remove filter.
+        <div class="page-content" id="moviesPage">
+            <div class="page-title" id="pageTitle"></div>
+            <div class="movies-container" id="moviesContainer"></div>
         </div>
     </div>
 
     <script>
-        // Movies data - loaded from movies.json
         let allMovies = [];
-        let selectedTags = new Set();
+        let currentPage = null;
 
         // Load movies from JSON
         async function loadMovies() {
@@ -170,36 +242,40 @@
         }
 
         function initializeApp() {
-            renderTags();
-            renderMovies();
+            renderMenu();
         }
 
-        function renderTags() {
-            const tagsContainer = document.getElementById('tagsContainer');
-            const uniqueTags = [...new Set(allMovies.map(m => m.tag))];
+        function renderMenu() {
+            const menuItems = document.getElementById('menuItems');
+            const uniqueTags = [...new Set(allMovies.map(m => m.tag))].sort();
             
-            tagsContainer.innerHTML = uniqueTags.map(tag => 
-                `<button class="tag-btn" data-tag="${tag}" onclick="toggleTag('${tag}')">${tag}</button>`
+            menuItems.innerHTML = uniqueTags.map(tag => 
+                `<button class="menu-item" data-tag="${tag}" onclick="showPage('${tag}')">${tag}</button>`
             ).join('');
         }
 
-        function toggleTag(tag) {
-            if (selectedTags.has(tag)) {
-                selectedTags.delete(tag);
-            } else {
-                selectedTags.clear();
-                selectedTags.add(tag);
-            }
-            updateUI();
+        function showPage(tag) {
+            currentPage = tag;
+            
+            // Update active menu item
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.tag === tag);
+            });
+            
+            // Hide initial page, show movies page
+            document.getElementById('initialPage').classList.remove('active');
+            document.getElementById('moviesPage').classList.add('active');
+            
+            // Render movies for this tag
+            renderMovies(tag);
         }
 
-        function renderMovies() {
+        function renderMovies(tag) {
+            const filtered = allMovies.filter(movie => movie.tag === tag);
+            const pageTitle = document.getElementById('pageTitle');
             const moviesContainer = document.getElementById('moviesContainer');
             
-            let filtered = allMovies;
-            if (selectedTags.size > 0) {
-                filtered = allMovies.filter(movie => selectedTags.has(movie.tag));
-            }
+            pageTitle.textContent = tag.charAt(0).toUpperCase() + tag.slice(1);
             
             if (filtered.length === 0) {
                 moviesContainer.innerHTML = '<div class="empty-state">No movies found</div>';
@@ -212,16 +288,6 @@
                     <span class="movie-tag">${movie.tag}</span>
                 </div>
             `).join('');
-        }
-
-        function updateUI() {
-            // Update tag buttons
-            document.querySelectorAll('.tag-btn').forEach(btn => {
-                const tag = btn.dataset.tag;
-                btn.classList.toggle('active', selectedTags.has(tag));
-            });
-            
-            renderMovies();
         }
 
         // Load movies on page load
