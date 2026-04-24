@@ -137,6 +137,7 @@
             gap: 15px;
             max-width: 700px;
             margin: 0 auto;
+            margin-top: 40px;
         }
         
         .movie-card {
@@ -295,10 +296,12 @@
         function renderMovies() {
             const moviesContainer = document.getElementById('moviesContainer');
             
-            let filtered = allMovies;
-            if (selectedTag) {
-                filtered = allMovies.filter(movie => movie.tag === selectedTag);
+            if (!selectedTag) {
+                moviesContainer.innerHTML = '';
+                return;
             }
+            
+            let filtered = allMovies.filter(movie => movie.tag === selectedTag);
             
             if (filtered.length === 0) {
                 moviesContainer.innerHTML = '<div class="empty-state">No movies found</div>';
