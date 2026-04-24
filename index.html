@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Tag Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .question {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 40px;
+            justify-content: center;
+        }
+        
+        .tag-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tag-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+        
+        .tag-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .movies-container {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .movie-card {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .movie-card:hover {
+            background: #f0f0f0;
+            transform: translateX(5px);
+        }
+        
+        .movie-title {
+            color: #333;
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .movie-tag {
+            display: inline-block;
+            background: #764ba2;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 1.1em;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Movies</h1>
+        <p class="subtitle">Explore by genre</p>
+        
+        <div class="question">What do you want to watch?</div>
+        
+        <div class="tags-container" id="tagsContainer"></div>
+        
+        <div class="movies-container" id="moviesContainer"></div>
+        
+        <div class="info-box">
+            <strong>💡 Tip:</strong> Click on tags to filter movies. Click again to remove filter.
+        </div>
+    </div>
+
+    <script>
+        // Movies data - loaded from movies.json
+        let allMovies = [];
+        let selectedTags = new Set();
+
+        // Load movies from JSON
+        async function loadMovies() {
+            try {
+                const response = await fetch('movies.json');
+                allMovies = await response.json();
+                initializeApp();
+            } catch (error) {
+                console.error('Error loading movies:', error);
+                document.getElementById('moviesContainer').innerHTML = 
+                    '<div class="empty-state">Error loading movies data</div>';
+            }
+        }
+
+        function initializeApp() {
+            renderTags();
+            renderMovies();
+        }
+
+        function renderTags() {
+            const tagsContainer = document.getElementById('tagsContainer');
+            const uniqueTags = [...new Set(allMovies.map(m => m.tag))];
+            
+            tagsContainer.innerHTML = uniqueTags.map(tag => 
+                `<button class="tag-btn" data-tag="${tag}" onclick="toggleTag('${tag}')">${tag}</button>`
+            ).join('');
+        }
+
+        function toggleTag(tag) {
+            if (selectedTags.has(tag)) {
+                selectedTags.delete(tag);
+            } else {
+                selectedTags.clear();
+                selectedTags.add(tag);
+            }
+            updateUI();
+        }
+
+        function renderMovies() {
+            const moviesContainer = document.getElementById('moviesContainer');
+            
+            let filtered = allMovies;
+            if (selectedTags.size > 0) {
+                filtered = allMovies.filter(movie => selectedTags.has(movie.tag));
+            }
+            
+            if (filtered.length === 0) {
+                moviesContainer.innerHTML = '<div class="empty-state">No movies found</div>';
+                return;
+            }
+            
+            moviesContainer.innerHTML = filtered.map(movie => `
+                <div class="movie-card">
+                    <div class="movie-title">${movie.title}</div>
+                    <span class="movie-tag">${movie.tag}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateUI() {
+            // Update tag buttons
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                const tag = btn.dataset.tag;
+                btn.classList.toggle('active', selectedTags.has(tag));
+            });
+            
+            renderMovies();
+        }
+
+        // Load movies on page load
+        loadMovies();
+    </script>
+</body>
+</html>
