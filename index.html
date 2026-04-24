@@ -75,15 +75,11 @@
             padding: 60px 40px;
             width: calc(100% - 280px);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
         
         .content-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
         }
         
         h1 {
@@ -105,40 +101,42 @@
             margin-bottom: 40px;
         }
         
-        .page-content {
-            display: none;
-            width: 100%;
-            max-width: 700px;
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 50px;
+            justify-content: center;
         }
         
-        .page-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
+        .tag-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: transparent;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .tag-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
         }
         
-        .initial-page {
-            text-align: center;
-        }
-        
-        .initial-page.active {
-            display: block;
+        .tag-btn.active {
+            background: #667eea;
+            color: white;
         }
         
         .movies-container {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            max-width: 700px;
+            margin: 0 auto;
         }
         
         .movie-card {
@@ -178,7 +176,32 @@
             font-size: 1.1em;
         }
         
-        .page-title {
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .all-movies-list {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .all-movies-title {
             color: #fff;
             font-size: 2em;
             margin-bottom: 40px;
@@ -205,28 +228,32 @@
 </head>
 <body>
     <div class="sidebar">
-        <h2>🎬 Genres</h2>
-        <div class="menu-items" id="menuItems"></div>
+        <h2>📋 Menu</h2>
+        <div class="menu-items">
+            <button class="menu-item active" onclick="showMainPage()">Movies List</button>
+        </div>
     </div>
     
     <div class="main-content">
-        <div class="initial-page active" id="initialPage">
+        <div class="page-content active" id="mainPage">
             <div class="content-header">
                 <h1>🎬 Movies</h1>
                 <p class="subtitle">Explore by genre</p>
             </div>
             <div class="question">What do you want to watch?</div>
+            <div class="tags-container" id="tagsContainer"></div>
+            <div class="movies-container" id="moviesContainer"></div>
         </div>
         
-        <div class="page-content" id="moviesPage">
-            <div class="page-title" id="pageTitle"></div>
-            <div class="movies-container" id="moviesContainer"></div>
+        <div class="page-content" id="allMoviesPage">
+            <div class="all-movies-title">All Movies</div>
+            <div class="all-movies-list" id="allMoviesList"></div>
         </div>
     </div>
 
     <script>
         let allMovies = [];
-        let currentPage = null;
+        let selectedTag = null;
 
         // Load movies from JSON
         async function loadMovies() {
@@ -242,40 +269,36 @@
         }
 
         function initializeApp() {
-            renderMenu();
+            renderTags();
         }
 
-        function renderMenu() {
-            const menuItems = document.getElementById('menuItems');
+        function renderTags() {
+            const tagsContainer = document.getElementById('tagsContainer');
             const uniqueTags = [...new Set(allMovies.map(m => m.tag))].sort();
             
-            menuItems.innerHTML = uniqueTags.map(tag => 
-                `<button class="menu-item" data-tag="${tag}" onclick="showPage('${tag}')">${tag}</button>`
+            tagsContainer.innerHTML = uniqueTags.map(tag => 
+                `<button class="tag-btn" data-tag="${tag}" onclick="selectTag('${tag}')">${tag}</button>`
             ).join('');
         }
 
-        function showPage(tag) {
-            currentPage = tag;
+        function selectTag(tag) {
+            selectedTag = selectedTag === tag ? null : tag;
             
-            // Update active menu item
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.toggle('active', item.dataset.tag === tag);
+            // Update tag button states
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tag === selectedTag);
             });
             
-            // Hide initial page, show movies page
-            document.getElementById('initialPage').classList.remove('active');
-            document.getElementById('moviesPage').classList.add('active');
-            
-            // Render movies for this tag
-            renderMovies(tag);
+            renderMovies();
         }
 
-        function renderMovies(tag) {
-            const filtered = allMovies.filter(movie => movie.tag === tag);
-            const pageTitle = document.getElementById('pageTitle');
+        function renderMovies() {
             const moviesContainer = document.getElementById('moviesContainer');
             
-            pageTitle.textContent = tag.charAt(0).toUpperCase() + tag.slice(1);
+            let filtered = allMovies;
+            if (selectedTag) {
+                filtered = allMovies.filter(movie => movie.tag === selectedTag);
+            }
             
             if (filtered.length === 0) {
                 moviesContainer.innerHTML = '<div class="empty-state">No movies found</div>';
@@ -288,6 +311,31 @@
                     <span class="movie-tag">${movie.tag}</span>
                 </div>
             `).join('');
+        }
+
+        function showMainPage() {
+            document.getElementById('mainPage').classList.add('active');
+            document.getElementById('allMoviesPage').classList.remove('active');
+            document.querySelector('.menu-item').classList.add('active');
+        }
+
+        function showAllMovies() {
+            document.getElementById('mainPage').classList.remove('active');
+            document.getElementById('allMoviesPage').classList.add('active');
+            renderAllMovies();
+        }
+
+        function renderAllMovies() {
+            const allMoviesList = document.getElementById('allMoviesList');
+            
+            const moviesHtml = allMovies.map(movie => `
+                <div class="movie-card">
+                    <div class="movie-title">${movie.title}</div>
+                    <span class="movie-tag">${movie.tag}</span>
+                </div>
+            `).join('');
+            
+            allMoviesList.innerHTML = `<div class="movies-container">${moviesHtml}</div>`;
         }
 
         // Load movies on page load
